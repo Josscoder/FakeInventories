@@ -9,6 +9,7 @@ import cn.nukkit.math.BlockVector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.BlockEntityDataPacket;
+import com.nukkitx.fakeinventories.FakeInventoriesPlugin;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -29,6 +30,22 @@ public class DoubleChestFakeInventory extends ChestFakeInventory {
         super(InventoryType.DOUBLE_CHEST, holder, title);
     }
 
+    private static byte[] getDoubleNbt(BlockVector3 pos, BlockVector3 pairPos, String name) {
+        CompoundTag tag = new CompoundTag()
+                .putString("id", BlockEntity.CHEST)
+                .putInt("x", pos.x)
+                .putInt("y", pos.y)
+                .putInt("z", pos.z)
+                .putInt("pairx", pairPos.x)
+                .putInt("pairz", pairPos.z)
+                .putString("CustomName", name == null ? "Chest" : name);
+
+        try {
+            return NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to create NBT for chest");
+        }
+    }
 
     @Override
     public void onOpen(Player who) {
@@ -37,9 +54,10 @@ public class DoubleChestFakeInventory extends ChestFakeInventory {
         List<BlockVector3> blocks = onOpenBlock(who);
         blockPositions.put(who, blocks);
 
-        Server.getInstance().getScheduler().scheduleDelayedTask(() -> {
-            onFakeOpen(who, blocks);
-        }, 3);
+        Server.getInstance().getScheduler().scheduleDelayedTask(FakeInventoriesPlugin.getInstance(),
+                () -> onFakeOpen(who, blocks),
+                3
+        );
     }
 
     @Override
@@ -64,22 +82,5 @@ public class DoubleChestFakeInventory extends ChestFakeInventory {
         blockEntityData.namedTag = getDoubleNbt(pos1, pos2, getName());
 
         who.dataPacket(blockEntityData);
-    }
-
-    private static byte[] getDoubleNbt(BlockVector3 pos, BlockVector3 pairPos, String name) {
-        CompoundTag tag = new CompoundTag()
-                .putString("id", BlockEntity.CHEST)
-                .putInt("x", pos.x)
-                .putInt("y", pos.y)
-                .putInt("z", pos.z)
-                .putInt("pairx", pairPos.x)
-                .putInt("pairz", pairPos.z)
-                .putString("CustomName", name == null ? "Chest" : name);
-
-        try {
-            return NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to create NBT for chest");
-        }
     }
 }

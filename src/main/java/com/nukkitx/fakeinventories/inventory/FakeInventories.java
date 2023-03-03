@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class FakeInventories {
+
     public List<BlockVector3> getFakeInventoryPositions(Player player) {
         FakeInventory inventory = FakeInventory.open.get(player);
         if (inventory == null) {

@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ChestFakeInventory extends FakeInventory {
+
     @Getter
     @Setter
     private String name;
@@ -36,8 +37,23 @@ public class ChestFakeInventory extends FakeInventory {
         super(InventoryType.CHEST, holder, title);
     }
 
-    ChestFakeInventory(InventoryType type, InventoryHolder holder, String title) {
+    public ChestFakeInventory(InventoryType type, InventoryHolder holder, String title) {
         super(type, holder, title);
+    }
+
+    private static byte[] getNbt(BlockVector3 pos, String name) {
+        CompoundTag tag = new CompoundTag()
+                .putString("id", BlockEntity.CHEST)
+                .putInt("x", pos.x)
+                .putInt("y", pos.y)
+                .putInt("z", pos.z)
+                .putString("CustomName", name == null ? "Chest" : name);
+
+        try {
+            return NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to create NBT for chest");
+        }
     }
 
     @Override
@@ -66,21 +82,6 @@ public class ChestFakeInventory extends FakeInventory {
         blockEntityData.namedTag = getNbt(pos, getName());
 
         who.dataPacket(blockEntityData);
-    }
-
-    private static byte[] getNbt(BlockVector3 pos, String name) {
-        CompoundTag tag = new CompoundTag()
-                .putString("id", BlockEntity.CHEST)
-                .putInt("x", pos.x)
-                .putInt("y", pos.y)
-                .putInt("z", pos.z)
-                .putString("CustomName", name == null ? "Chest" : name);
-
-        try {
-            return NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to create NBT for chest");
-        }
     }
 }
 

@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FakeSlotChangeEvent implements Cancellable {
+
     private final Player player;
     private final FakeInventory inventory;
     private final SlotChangeAction action;

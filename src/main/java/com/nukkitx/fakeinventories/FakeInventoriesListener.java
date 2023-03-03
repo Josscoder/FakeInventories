@@ -22,41 +22,52 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 public class FakeInventoriesListener implements Listener {
+
     private final FakeInventories fakeInventories;
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPacketSend(DataPacketSendEvent event) {
         DataPacket packet = event.getPacket();
-        if (packet instanceof UpdateBlockPacket) {
-            UpdateBlockPacket updateBlock = (UpdateBlockPacket) packet;
-            List<BlockVector3> positions = fakeInventories.getFakeInventoryPositions(event.getPlayer());
-            if (positions != null) {
-                for (BlockVector3 pos : positions) {
-                    if (pos.x == updateBlock.x && pos.y == updateBlock.y && pos.z == updateBlock.z) {
-                        event.setCancelled();
-                        return;
-                    }
-                }
+
+        if (!(packet instanceof UpdateBlockPacket)) {
+            return;
+        }
+
+        List<BlockVector3> positions = fakeInventories.getFakeInventoryPositions(event.getPlayer());
+        if (positions == null) {
+            return;
+        }
+
+        UpdateBlockPacket updateBlock = (UpdateBlockPacket) packet;
+
+        for (BlockVector3 pos : positions) {
+            if (pos.x == updateBlock.x && pos.y == updateBlock.y && pos.z == updateBlock.z) {
+                event.setCancelled();
+                return;
             }
-            ;
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTransaction(InventoryTransactionEvent event) {
         Map<FakeInventory, List<SlotChangeAction>> actions = new HashMap<>();
-        Player source = event.getTransaction().getSource();
-        long creationTime = event.getTransaction().getCreationTime();
-        for (InventoryAction action : event.getTransaction().getActions()) {
-            if (action instanceof SlotChangeAction) {
-                SlotChangeAction slotChange = (SlotChangeAction) action;
-                if (slotChange.getInventory() instanceof FakeInventory) {
-                    FakeInventory inventory = (FakeInventory) slotChange.getInventory();
-                    List<SlotChangeAction> slotChanges = actions.computeIfAbsent(inventory, fakeInventory -> new ArrayList<>());
 
-                    slotChanges.add(slotChange);
-                }
+        Player source = event.getTransaction().getSource();
+
+        for (InventoryAction action : event.getTransaction().getActions()) {
+            if (!(action instanceof SlotChangeAction)) {
+                continue;
             }
+
+            SlotChangeAction slotChange = (SlotChangeAction) action;
+            if (!(slotChange.getInventory() instanceof FakeInventory)) {
+                continue;
+            }
+
+            FakeInventory inventory = (FakeInventory) slotChange.getInventory();
+            List<SlotChangeAction> slotChanges = actions.computeIfAbsent(inventory, fakeInventory -> new ArrayList<>());
+
+            slotChanges.add(slotChange);
         }
 
         boolean cancel = false;
