@@ -13,6 +13,8 @@ import cn.nukkit.network.protocol.ContainerOpenPacket;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
 import com.google.common.base.Preconditions;
 import com.nukkitx.fakeinventories.FakeInventoriesPlugin;
+import com.nukkitx.fakeinventories.inventory.event.FakeInventoryCloseEvent;
+import com.nukkitx.fakeinventories.inventory.event.FakeSlotChangeEvent;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -118,9 +120,7 @@ public abstract class FakeInventory extends ContainerInventory {
     public boolean onSlotChange(Player source, SlotChangeAction action) {
         if (!listeners.isEmpty()) {
             FakeSlotChangeEvent event = new FakeSlotChangeEvent(source, this, action);
-            for (FakeInventoryListener listener : listeners) {
-                listener.onSlotChange(event);
-            }
+            listeners.forEach(listener -> listener.onSlotChange(event));
             return event.isCancelled();
         }
         return false;
@@ -132,7 +132,15 @@ public abstract class FakeInventory extends ContainerInventory {
 
     void close() {
         Preconditions.checkState(!closed, "Already closed");
-        getViewers().forEach(player -> player.removeWindow(this));
+        getViewers().forEach(player -> {
+            FakeInventoryCloseEvent event = new FakeInventoryCloseEvent(player, this);
+
+            listeners.forEach(listener -> listener.onClose(event));
+
+            if (!event.isCancelled()) {
+                player.removeWindow(this);
+            }
+        });
         closed = true;
     }
 

@@ -1,8 +1,9 @@
-package com.nukkitx.fakeinventories.inventory;
+package com.nukkitx.fakeinventories.inventory.event;
 
 import cn.nukkit.Player;
 import cn.nukkit.event.Cancellable;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
+import com.nukkitx.fakeinventories.inventory.FakeInventory;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +16,7 @@ public class FakeSlotChangeEvent implements Cancellable {
     private final SlotChangeAction action;
     private boolean cancelled = false;
 
-    FakeSlotChangeEvent(Player player, FakeInventory inventory, SlotChangeAction action) {
+    public FakeSlotChangeEvent(Player player, FakeInventory inventory, SlotChangeAction action) {
         this.player = player;
         this.inventory = inventory;
         this.action = action;
