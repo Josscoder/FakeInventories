@@ -80,8 +80,15 @@ public abstract class FakeInventory extends ContainerInventory {
 
     @Override
     public void onClose(Player who) {
-        super.onClose(who);
-        open.remove(who, this);
+        FakeInventoryCloseEvent event = new FakeInventoryCloseEvent(who, this);
+
+        listeners.forEach(listener -> listener.onClose(event));
+
+        if (!event.isCancelled()) {
+            who.removeWindow(this);
+            super.onClose(who);
+            open.remove(who, this);
+        }
 
         List<BlockVector3> blocks = blockPositions.get(who);
 
@@ -130,7 +137,7 @@ public abstract class FakeInventory extends ContainerInventory {
         Preconditions.checkState(!closed, "Already closed");
     }
 
-    void close() {
+    public void close() {
         Preconditions.checkState(!closed, "Already closed");
         getViewers().forEach(player -> {
             FakeInventoryCloseEvent event = new FakeInventoryCloseEvent(player, this);
