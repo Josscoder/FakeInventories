@@ -85,7 +85,6 @@ public abstract class FakeInventory extends ContainerInventory {
         listeners.forEach(listener -> listener.onClose(event));
 
         if (!event.isCancelled()) {
-            who.removeWindow(this);
             super.onClose(who);
             open.remove(who, this);
         }
