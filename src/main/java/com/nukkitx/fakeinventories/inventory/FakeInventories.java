@@ -9,7 +9,7 @@ import java.util.Optional;
 public class FakeInventories {
 
     public List<BlockVector3> getFakeInventoryPositions(Player player) {
-        FakeInventory inventory = FakeInventory.open.get(player);
+        FakeInventory inventory = FakeInventory.getOpen().get(player);
         if (inventory == null) {
             return null;
         }
@@ -17,7 +17,7 @@ public class FakeInventories {
     }
 
     public Optional<FakeInventory> getFakeInventory(Player player) {
-        return Optional.ofNullable(FakeInventory.open.get(player));
+        return Optional.ofNullable(FakeInventory.getOpen().get(player));
     }
 
     /**

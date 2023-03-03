@@ -13,6 +13,7 @@ import cn.nukkit.network.protocol.ContainerOpenPacket;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
 import com.google.common.base.Preconditions;
 import com.nukkitx.fakeinventories.FakeInventoriesPlugin;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class FakeInventory extends ContainerInventory {
 
+    @Getter
     private static final Map<Player, FakeInventory> open = new ConcurrentHashMap<>();
+
     private static final BlockVector3 ZERO = new BlockVector3(0, 0, 0);
     protected final Map<Player, List<BlockVector3>> blockPositions = new HashMap<>();
     private final List<FakeInventoryListener> listeners = new CopyOnWriteArrayList<>();
