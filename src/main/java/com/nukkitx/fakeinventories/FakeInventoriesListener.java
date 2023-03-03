@@ -13,17 +13,19 @@ import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
 import com.nukkitx.fakeinventories.inventory.FakeInventories;
 import com.nukkitx.fakeinventories.inventory.FakeInventory;
-import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RequiredArgsConstructor
 public class FakeInventoriesListener implements Listener {
 
     private final FakeInventories fakeInventories;
+
+    public FakeInventoriesListener(FakeInventories fakeInventories) {
+        this.fakeInventories = fakeInventories;
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPacketSend(DataPacketSendEvent event) {
